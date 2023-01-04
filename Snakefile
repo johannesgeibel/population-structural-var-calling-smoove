@@ -17,7 +17,6 @@ makedirs("logs_slurm")
 
 pipeline = "population-structural-var-calling-smoove" 
 
-
 include: "rules/create_file_log.smk"
 
 REFERENCE=config["REFERENCE"]

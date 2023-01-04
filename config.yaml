@@ -1,9 +1,9 @@
-OUTDIR: /path/to/output 
-READS_DIR: /path/to/reads/ # don't add the reads files, just the directory where they are
-SAMPLE_LIST: /path/to/file
-REFERENCE: /path/to/assembly
-CONTIGS_IGNORE: /path/to/file
-SPECIES: <species_name>
-PREFIX: <output name>
-NUM_CHRS: <number of chromosomes>
-BWA_MEM_M: <Y/N>
+#OUTDIR: /path/to/output 
+READS_DIR: bams # don't add the reads files, just the directory where they are
+SAMPLE_LIST: samples.csv
+REFERENCE: ./reference.fa
+CONTIGS_IGNORE: ./ignore.txt
+SPECIES: chicken
+PREFIX: test
+NUM_CHRS: 50
+BWA_MEM_M: Y
