@@ -26,6 +26,10 @@ PREFIX = config["PREFIX"]
 SAMPLES_LIST = config["SAMPLE_LIST"]
 CONTIGS_IGNORE = config["CONTIGS_IGNORE"]
 SPECIES = config["SPECIES"]
+if "VEP_CACHE" in config:
+    VEP_CACHE = config["VEP_CACHE"]
+else:
+    VEP_CACHE = "/lustre/nobackup/SHARED/cache/"
 NUM_CHRS =  config["NUM_CHRS"]
 BWA_MEM_M = config["BWA_MEM_M"]
 
@@ -82,7 +86,7 @@ rule split_disc_reads:
         'smoove_call'
     shell:
         """
-module load samtools
+# module load samtools
 
 sname=`samtools view -H {input} | grep '^@RG' | sed "s/.*SM:\([^\\t]*\).*/\\1/g" | uniq`
 
@@ -224,17 +228,17 @@ rule run_vep:
     conda:
         "envs/vep_dependencies.yaml"
     params:
-        species = SPECIES
+        species = SPECIES,
+        cache = VEP_CACHE
     group:
         'calling'
     shell:
         """
-module load samtools
-/cm/shared/apps/SHARED/ensembl-vep/vep -i {input} \
+vep -i {input} \
 --format vcf \
 --buffer_size 5000 \
 --offline \
---dir /lustre/nobackup/SHARED/cache/ \
+--dir {params.cache} \
 --species {params.species} \
 --vcf \
 --force_overwrite \
@@ -256,6 +260,8 @@ rule PCA:
         eigenval = "5_postprocessing/{prefix}.eigenval",
     message:
         'Rule {rule} processing'
+    conda:
+        "envs/plink.yaml"
     params:
         prefix= os.path.join("5_postprocessing",PREFIX),
         num_chrs = NUM_CHRS
@@ -277,13 +283,15 @@ rule plot_PCA:
         "FIGURES/{prefix}.pdf"
     message:
         'Rule {rule} processing'
+    conda:
+        "envs/r.yaml"
     params:
         rscript = os.path.join(workflow.basedir, "scripts/basic_pca_plot.R")
     # group:
     #     'calling'
     shell:
         """
-module load R/3.6.2
+#module load R/3.6.2
 echo $CONDA_PREFIX
 export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
@@ -322,6 +330,8 @@ rule add_depth:
         bnd = "5_postprocessing/{prefix}_BND.vcf"
     message:
         'Rule {rule} processing'
+    conda:
+        "envs/python3.yaml"
     params:
         script = os.path.join(workflow.basedir, "scripts/add_depth_field.py"),
         prefix = os.path.join("5_postprocessing",PREFIX)
@@ -339,6 +349,8 @@ rule get_tsv:
         "5_postprocessing/{prefix}_DUP_DEL_INV_table.tsv"
     message:
         'Rule {rule} processing'
+    conda:
+        "envs/python3.yaml"
     params:
         script = os.path.join(workflow.basedir, "scripts/get_flat_file.py"),
     log:

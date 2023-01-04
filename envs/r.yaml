@@ -1,0 +1,10 @@
+name: r
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - conda-forge:r-base==3.6.2
+  - r-data.table
+  - r-optparse
+  - r-ggplot2

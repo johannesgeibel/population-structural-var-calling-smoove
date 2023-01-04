@@ -11,4 +11,7 @@ dependencies:
   - perl=5.26.2=h36c2ea0_1008
   - perl-dbi=1.642=pl526_0
   - perl-try-tiny=0.30=pl526_1
+  - bioconda:samtools>=1.10
+  - bioconda:ensembl-vep==108.2
+
 prefix: /home/WUR/moiti001/miniconda3/envs/vep_dependencies
