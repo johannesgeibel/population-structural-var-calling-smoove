@@ -76,11 +76,13 @@ rule split_disc_reads:
         done = touch("1_call/{sample}.done")
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/split_disc_reads/{sample}.tsv"
     params:
         scripts_dir = os.path.join(workflow.basedir, "scripts/"),
         outdir = "1_call"
     conda:
-        "envs/python2.7.yml"
+        "python2.7"
     group:
         'smoove_call'
     shell:
@@ -118,12 +120,14 @@ rule smoove_call:
         # t4 = temp("1_call/{sample}.histo")
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/smoove_call/{sample}.tsv"
     params:
         outdir = "1_call",
         contigs=CONTIGS,
         scripts_dir = os.path.join(workflow.basedir, "scripts/")
     conda:
-        "envs/smoove.yaml"
+        "smoove"
     group:
         'smoove_call'
     shell:
@@ -152,13 +156,15 @@ rule smoove_merge:
     output:
         vcf = expand("2_merged/{prefix}.sites.vcf.gz", prefix=PREFIX),
         counts = expand("2_merged/{prefix}.smoove-counts.html", prefix=PREFIX)
+    benchmark:
+        "benchmarks/smoove_merge/{prefix}.tsv"
     message:
         'Rule {rule} processing'
     params:
         outdir = "2_merged",
         name = PREFIX
     conda:
-        "envs/smoove.yaml"
+        "smoove"
     shell:
         """
 smoove merge --name {params.name} \
@@ -177,12 +183,14 @@ rule smoove_genotype:
         idx = "3_genotyped/{sample}-smoove.genotyped.vcf.gz.csi"
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/smoove_genotype/{sample}.tsv"
     params:
         outdir = "3_genotyped",
         name = "{sample}",
         scripts_dir = os.path.join(workflow.basedir, "scripts/")
     conda:
-        "envs/smoove.yaml"
+        "smoove"
     shell:
         """
 export PATH={params.scripts_dir}:$PATH
@@ -204,8 +212,10 @@ rule smoove_paste:
         temp("4_paste/{prefix}.smoove.square.vcf.gz")
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/smoove_paste/{prefix}.tsv"
     conda:
-        "envs/smoove.yaml"
+        "smoove"
     params:
         outdir = "4_paste",
         name = PREFIX
@@ -224,8 +234,10 @@ rule run_vep:
         summary = "5_postprocessing/{prefix}.smoove.square.vep.vcf.gz_summary.html"
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/run_vep/{prefix}.tsv"
     conda:
-        "envs/vep_dependencies.yaml"
+        "vep_dependencies"
     params:
         species = SPECIES,
         cache = VEP_CACHE
@@ -259,8 +271,10 @@ rule PCA:
         eigenval = "5_postprocessing/{prefix}.eigenval",
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/PCA/{prefix}.tsv"
     conda:
-        "envs/plink.yaml"
+        "plink"
     params:
         prefix= os.path.join("5_postprocessing",PREFIX),
         num_chrs = NUM_CHRS
@@ -280,10 +294,12 @@ rule plot_PCA:
         sample_list = SAMPLES_LIST
     output:
         "FIGURES/{prefix}.pdf"
+    benchmark:
+        "benchmarks/plot_PCA/{prefix}.tsv"
     message:
         'Rule {rule} processing'
     conda:
-        "envs/r.yaml"
+        "r"
     params:
         rscript = os.path.join(workflow.basedir, "scripts/basic_pca_plot.R")
     # group:
@@ -306,8 +322,10 @@ rule simple_stats:
         support = "6_metrics/{prefix}.survivor.statssupport"
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/simple_stats/{prefix}.tsv"
     conda:
-        "envs/survivor.yaml"
+        "survivor"
     params:
         tmp = "6_metrics/{prefix}.stats.temp.vcf"
     log:
@@ -329,8 +347,10 @@ rule add_depth:
         bnd = "5_postprocessing/{prefix}_BND.vcf"
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/add_depth/{prefix}.tsv"
     conda:
-        "envs/python3.yaml"
+        "python3"
     params:
         script = os.path.join(workflow.basedir, "scripts/add_depth_field.py"),
         prefix = os.path.join("5_postprocessing",PREFIX)
@@ -348,8 +368,10 @@ rule get_tsv:
         "5_postprocessing/{prefix}_DUP_DEL_INV_table.tsv"
     message:
         'Rule {rule} processing'
+    benchmark:
+        "benchmarks/get_tsv/get_tsv.tsv"
     conda:
-        "envs/python3.yaml"
+        "python3"
     params:
         script = os.path.join(workflow.basedir, "scripts/get_flat_file.py"),
     log:
