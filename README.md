@@ -2,6 +2,8 @@
 layout: page
 ---
 
+# !!!! This is a fork of the original pipeline by CarolinaPB to run in a specific environment -- please clone the original repository !!!!!! 
+
 [Link to the repository](https://github.com/CarolinaPB/population-structural-var-calling-smoove/tree/single_run)
 
 ## First follow the instructions here:
